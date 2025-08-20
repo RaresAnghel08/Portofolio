@@ -111,30 +111,34 @@ window.addEventListener('load', function() {
 
 // Typing Effect for Hero Title - Looping with highlight support
 function typeWriterWithHighlightLoop(element, typeSpeed = 80, deleteSpeed = 40, pauseAfterType = 1200) {
+    // Simple text without special characters - let HTML handle the line break
     const fullText = "Hi, I'm Rares Anghel";
-    const highlightStart = fullText.indexOf('Rares Anghel');
-    const highlightEnd = highlightStart + 'Rares Anghel'.length;
+    const highlightText = 'Rares Anghel';
+    const highlightStart = fullText.indexOf(highlightText);
+    const highlightEnd = highlightStart + highlightText.length;
 
     let i = 0;
     let direction = 1; // 1 = typing, -1 = deleting
 
-    element.innerHTML = '';
+    // Store the original HTML structure
+    const originalHTML = element.innerHTML;
 
     function frame() {
-        // Build display based on current i
-        const beforeHighlight = fullText.substring(0, highlightStart);
-        const highlightText = fullText.substring(highlightStart, highlightEnd);
-        const afterHighlightPartial = fullText.substring(highlightEnd, i);
-
+        const currentText = fullText.substring(0, i);
+        
         if (i <= highlightStart) {
-            element.innerHTML = fullText.substring(0, i);
+            // Before highlight - just show the text with line break
+            element.innerHTML = currentText.replace("Hi, I'm", "Hi, I'm<br>");
         } else if (i > highlightStart && i <= highlightEnd) {
-            // partial highlight
+            // During highlight - partial highlight
+            const beforeHighlight = fullText.substring(0, highlightStart);
             const partialHighlight = fullText.substring(highlightStart, i);
-            element.innerHTML = beforeHighlight + '<span class="highlight">' + partialHighlight + '</span>';
+            element.innerHTML = beforeHighlight.replace("Hi, I'm", "Hi, I'm<br>") + '<span class="highlight">' + partialHighlight + '</span>';
         } else {
-            // typed past highlight
-            element.innerHTML = beforeHighlight + '<span class="highlight">' + highlightText + '</span>' + afterHighlightPartial;
+            // After highlight - complete
+            const beforeHighlight = fullText.substring(0, highlightStart);
+            const afterHighlight = fullText.substring(highlightEnd, i);
+            element.innerHTML = beforeHighlight.replace("Hi, I'm", "Hi, I'm<br>") + '<span class="highlight">' + highlightText + '</span>' + afterHighlight;
         }
 
         if (direction === 1) {
@@ -142,7 +146,6 @@ function typeWriterWithHighlightLoop(element, typeSpeed = 80, deleteSpeed = 40, 
                 i++;
                 setTimeout(frame, typeSpeed);
             } else {
-                // finished typing, pause then start deleting
                 setTimeout(() => { direction = -1; setTimeout(frame, deleteSpeed); }, pauseAfterType);
             }
         } else {
@@ -150,7 +153,6 @@ function typeWriterWithHighlightLoop(element, typeSpeed = 80, deleteSpeed = 40, 
                 i--;
                 setTimeout(frame, deleteSpeed);
             } else {
-                // finished deleting, restart typing after short pause
                 direction = 1;
                 setTimeout(frame, typeSpeed);
             }
